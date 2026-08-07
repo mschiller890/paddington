@@ -81,6 +81,7 @@ import kotlinx.coroutines.launch
 private const val MIN_PADDING_DP = 0
 private const val MAX_PADDING_DP = 64
 private const val SYSTEM_UI_PACKAGE = "com.android.systemui"
+private val CONTENT_HORIZONTAL_PADDING = 27.7.dp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -203,7 +204,7 @@ fun PaddingSettingsScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = CONTENT_HORIZONTAL_PADDING)
                 .statusBarsPadding()
         ) {
             Text(
@@ -283,14 +284,55 @@ fun PaddingSettingsScreen(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = CONTENT_HORIZONTAL_PADDING)
                 .padding(bottom = 24.dp, top = 16.dp)
                 .navigationBarsPadding()
         ) {
             if (s == null) {
-                LoadingBar()
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+    LoadingBar()
+    Spacer(modifier = Modifier.height(8.dp))
+} else {
+    val stockDp = formatDp(stockInset, density)
+    val nowDp = formatDp(actualLeftInset(s, cutout.second), density)
+    val newDp = formatDp(
+        stockInset + (paddingValue * density).roundToInt(),
+        density
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "Stock: $stockDp dp",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = "Now: $nowDp dp",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = "After applying: $newDp dp",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
 
             Button(
                 onClick = {
