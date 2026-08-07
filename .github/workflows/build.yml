@@ -48,9 +48,16 @@ jobs:
         shell: pwsh
         env:
           RUN_NUMBER: ${{ github.run_number }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          $versionName = "0.0.$env:RUN_NUMBER"
-          $versionCode = $env:RUN_NUMBER
+          if ($env:REF_NAME -like "v*") {
+            $versionName = $env:REF_NAME.Substring(1)
+            $parts = $versionName.Split(".")
+            $versionCode = [int]$parts[0] * 10000 + [int]$parts[1] * 100 + [int]$parts[2]
+          } else {
+            $versionName = "0.0.$env:RUN_NUMBER"
+            $versionCode = $env:RUN_NUMBER
+          }
           .\module\build.ps1 -VersionName $versionName -VersionCode $versionCode
           Write-Output "versionName=$versionName" >> $env:GITHUB_OUTPUT
 
