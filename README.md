@@ -8,6 +8,8 @@ By default the padding is rather tight, so icons like the notification icons,
 Wi-Fi and battery sit close to the screen edges. Paddington adds **+16 dp** of
 extra horizontal padding on each side so the status bar looks less cramped.
 
+<img width="4320" height="430" alt="output" src="https://github.com/user-attachments/assets/a1cacfbf-b3d5-4450-8356-fd63c7cd9aa2" />
+
 ## How it works
 
 On One UI 8.5 the horizontal padding of the status bar icon containers is
