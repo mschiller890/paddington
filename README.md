@@ -100,25 +100,6 @@ versioning comes from the git tag (`v1.2.3` → versionName `1.2.3`, versionCode
 
 See [docs/BUILDING.md](docs/BUILDING.md) for details and troubleshooting.
 
-## Project layout
-
-```
-paddington/
-├── .github/workflows/build.yml    # CI: build + publish release on tags
-├── app/                           # Gradle project
-│   ├── app/
-│   │   ├── libs/api-82.jar        # XposedBridge API (compileOnly)
-│   │   └── src/main/
-│   │       ├── assets/xposed_init
-│   │       ├── java/.../Hook.java          # LSPosed entry point
-│   │       ├── java/.../MainActivity.kt    # Compose settings UI
-│   │       ├── java/.../SettingsProvider.java
-│   │       └── res/                       # Compose theme, launcher icons
-│   └── gradle/libs.versions.toml  # dependency versions
-├── docs/                          # development documentation
-└── paddington.keystore            # signing key (gitignored, generated)
-```
-
 ## Documentation
 
 - [docs/BUILDING.md](docs/BUILDING.md) — how the Gradle project is set up and
