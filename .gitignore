@@ -1,13 +1,21 @@
-# Toolchain / build output
-.tools/
-.build/
-dist/
+# --- Android Studio / Gradle ---
+.gradle/
+.idea/
+.kotlin/
+build/
+captures/
+local.properties
+*.iml
+.DS_Store
+.cxx/
+.externalNativeBuild/
+
+# --- Build output / signing ---
+app/app/build/
+*.apk
 
 # Generated signing key (keep private!)
 paddington.keystore
-
-# Third-party jars fetched by fetch-tools.ps1
-module/lib/api-82.jar
 
 # Local debugging artifacts
 *.db
