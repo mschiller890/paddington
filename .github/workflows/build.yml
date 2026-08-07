@@ -13,6 +13,8 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    outputs:
+      versionName: ${{ steps.build.outputs.versionName }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,14 +44,21 @@ jobs:
           }
 
       - name: Build APK
+        id: build
         shell: pwsh
-        run: .\module\build.ps1
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          $versionName = "0.0.$env:RUN_NUMBER"
+          $versionCode = $env:RUN_NUMBER
+          .\module\build.ps1 -VersionName $versionName -VersionCode $versionCode
+          Write-Output "versionName=$versionName" >> $env:GITHUB_OUTPUT
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: paddington-apk
-          path: dist/paddington-1.0.apk
+          path: dist/paddington-${{ steps.build.outputs.versionName }}.apk
           if-no-files-found: error
 
   release:
@@ -66,5 +75,5 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/paddington-1.0.apk
+          files: release/paddington-${{ needs.build.outputs.versionName }}.apk
           generate_release_notes: true

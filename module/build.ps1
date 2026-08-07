@@ -12,7 +12,9 @@
 #   powershell -ExecutionPolicy Bypass -File .\module\build.ps1 -SkipSign
 
 param(
-    [switch]$SkipSign
+    [switch]$SkipSign,
+    [string]$VersionName = "1.0",
+    [string]$VersionCode = "1"
 )
 
 $ErrorActionPreference = "Stop"
@@ -46,8 +48,6 @@ $d8       = Join-Path $toolsDir "build-tools\34.0.0\d8.bat"
 $zipalign = Join-Path $toolsDir "build-tools\34.0.0\zipalign.exe"
 $apksigner = Join-Path $toolsDir "build-tools\34.0.0\apksigner.bat"
 
-$versionCode = "1"
-$versionName = "1.0"
 $distDir    = Join-Path $root "dist"
 
 # -- sanity checks ---------------------------------------------------------
@@ -79,7 +79,7 @@ if (-not (Test-Path "$buildDir\classes.dex")) { throw "d8 did not produce classe
 Write-Host "== aapt2 link =="
 & $aapt2 link -o "$buildDir\base.apk" --manifest $manifest -I $platformJar `
     --min-sdk-version 28 --target-sdk-version 35 `
-    --version-code $versionCode --version-name $versionName --auto-add-overlay
+    --version-code $VersionCode --version-name $VersionName --auto-add-overlay
 if ($LASTEXITCODE -ne 0) { throw "aapt2 link failed" }
 
 # -- 3. add dex + assets into the APK ---------------------------------------
@@ -117,7 +117,7 @@ Write-Host "== zipalign =="
 if ($LASTEXITCODE -ne 0) { throw "zipalign failed" }
 
 New-Item -ItemType Directory -Path $distDir -Force | Out-Null
-$outApk = Join-Path $distDir "paddington-$versionName.apk"
+$outApk = Join-Path $distDir "paddington-$VersionName.apk"
 
 if ($SkipSign) {
     Copy-Item "$buildDir\module-aligned.apk" $outApk -Force
