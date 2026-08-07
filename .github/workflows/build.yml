@@ -1,0 +1,70 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Fetch toolchain
+        shell: pwsh
+        run: .\module\fetch-tools.ps1
+
+      - name: Restore signing keystore (if secret configured)
+        shell: pwsh
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if ($env:KEYSTORE_B64) {
+            [System.IO.File]::WriteAllBytes(
+              (Join-Path $env:GITHUB_WORKSPACE "paddington.keystore"),
+              [System.Convert]::FromBase64String($env:KEYSTORE_B64))
+            Write-Host "Signing keystore restored from secret."
+          } else {
+            Write-Host "No KEYSTORE_B64 secret set; build.ps1 will generate a throwaway keystore."
+          }
+
+      - name: Build APK
+        shell: pwsh
+        run: .\module\build.ps1
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: paddington-apk
+          path: dist/paddington-1.0.apk
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: paddington-apk
+          path: release
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/paddington-1.0.apk
+          generate_release_notes: true
